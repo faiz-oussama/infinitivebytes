@@ -2,6 +2,17 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import {
+    useReactTable,
+    getCoreRowModel,
+    getSortedRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    flexRender,
+    createColumnHelper,
+    SortingState,
+    ColumnFiltersState,
+} from '@tanstack/react-table'
 import { Input } from '@/components/ui/input'
 import {
     Table,
@@ -13,8 +24,9 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ChevronLeft, ChevronRight, Search, Eye, EyeOff } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search, Eye, EyeOff, ArrowUpDown } from 'lucide-react'
 import { UpgradePrompt } from '@/components/upgrade-prompt'
+import { toast } from 'sonner'
 
 type Contact = {
     id: string
@@ -37,6 +49,8 @@ type ContactsTableProps = {
     isAtLimit: boolean
 }
 
+const columnHelper = createColumnHelper<Contact>()
+
 export function ContactsTable({
     contacts,
     currentPage,
@@ -51,20 +65,8 @@ export function ContactsTable({
     const [viewedContacts, setViewedContacts] = useState<Set<string>>(new Set())
     const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
     const [localViewsToday, setLocalViewsToday] = useState(viewsToday)
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault()
-        const params = new URLSearchParams()
-        if (search) params.set('search', search)
-        router.push(`/contacts?${params.toString()}`)
-    }
-
-    const handlePageChange = (page: number) => {
-        const params = new URLSearchParams()
-        if (search) params.set('search', search)
-        params.set('page', page.toString())
-        router.push(`/contacts?${params.toString()}`)
-    }
+    const [sorting, setSorting] = useState<SortingState>([])
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
     const handleViewContact = async (contactId: string) => {
         if (isAtLimit || localViewsToday >= 50) {
@@ -82,6 +84,7 @@ export function ContactsTable({
             if (response.ok) {
                 setViewedContacts((prev) => new Set(prev).add(contactId))
                 setLocalViewsToday((prev) => prev + 1)
+                toast.success('Contact revealed successfully')
 
                 if (localViewsToday + 1 >= 50) {
                     setShowUpgradePrompt(true)
@@ -91,11 +94,164 @@ export function ContactsTable({
                 const data = await response.json()
                 if (data.error === 'Daily limit reached') {
                     setShowUpgradePrompt(true)
+                    toast.error('Daily limit reached')
+                } else {
+                    toast.error('Failed to view contact')
                 }
             }
         } catch (error) {
-            console.error('Error viewing contact:', error)
+            toast.error('An error occurred while viewing the contact')
         }
+    }
+
+    const columns = [
+        columnHelper.accessor(
+            (row) => [row.first_name, row.last_name].filter(Boolean).join(' '),
+            {
+                id: 'name',
+                header: ({ column }) => (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                        className="hover:bg-transparent p-0"
+                    >
+                        Name
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                ),
+                cell: ({ row }) => {
+                    const isViewed = viewedContacts.has(row.original.id)
+                    const fullName = [row.original.first_name, row.original.last_name]
+                        .filter(Boolean)
+                        .join(' ') || '-'
+                    return (
+                        <span className="font-medium">
+                            {isViewed ? fullName : '•••••'}
+                        </span>
+                    )
+                },
+            }
+        ),
+        columnHelper.accessor('email', {
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                    className="hover:bg-transparent p-0"
+                >
+                    Email
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            cell: ({ row }) => {
+                const isViewed = viewedContacts.has(row.original.id)
+                return isViewed ? row.original.email || '-' : '•••••'
+            },
+        }),
+        columnHelper.accessor('phone', {
+            header: 'Phone',
+            cell: ({ row }) => {
+                const isViewed = viewedContacts.has(row.original.id)
+                return isViewed ? row.original.phone || '-' : '•••••'
+            },
+        }),
+        columnHelper.accessor('title', {
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                    className="hover:bg-transparent p-0"
+                >
+                    Title
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            cell: ({ row }) => {
+                const isViewed = viewedContacts.has(row.original.id)
+                return isViewed ? row.original.title || '-' : '•••••'
+            },
+        }),
+        columnHelper.accessor('department', {
+            header: 'Department',
+            cell: ({ row }) => {
+                const isViewed = viewedContacts.has(row.original.id)
+                return isViewed ? row.original.department || '-' : '•••••'
+            },
+        }),
+        columnHelper.accessor('agency.name', {
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                    className="hover:bg-transparent p-0"
+                >
+                    Agency
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            cell: ({ row }) => row.original.agency?.name || '-',
+        }),
+        columnHelper.display({
+            id: 'action',
+            header: () => <div className="text-right">Action</div>,
+            cell: ({ row }) => {
+                const isViewed = viewedContacts.has(row.original.id)
+                return (
+                    <div className="text-right">
+                        {isViewed ? (
+                            <Badge variant="secondary" className="gap-1">
+                                <Eye className="h-3 w-3" />
+                                Viewed
+                            </Badge>
+                        ) : (
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleViewContact(row.original.id)}
+                                className="gap-1"
+                            >
+                                <EyeOff className="h-3 w-3" />
+                                View
+                            </Button>
+                        )}
+                    </div>
+                )
+            },
+        }),
+    ]
+
+    const table = useReactTable({
+        data: contacts,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        state: {
+            sorting,
+            columnFilters,
+        },
+        initialState: {
+            pagination: {
+                pageSize: 20,
+            },
+        },
+    })
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault()
+        const params = new URLSearchParams()
+        if (search) params.set('search', search)
+        router.push(`/contacts?${params.toString()}`)
+    }
+
+    const handlePageChange = (page: number) => {
+        const params = new URLSearchParams()
+        if (search) params.set('search', search)
+        params.set('page', page.toString())
+        router.push(`/contacts?${params.toString()}`)
     }
 
     return (
@@ -116,71 +272,41 @@ export function ContactsTable({
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Phone</TableHead>
-                            <TableHead>Title</TableHead>
-                            <TableHead>Department</TableHead>
-                            <TableHead>Agency</TableHead>
-                            <TableHead className="text-right">Action</TableHead>
-                        </TableRow>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                header.column.columnDef.header,
+                                                header.getContext()
+                                            )}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        ))}
                     </TableHeader>
                     <TableBody>
-                        {contacts.length === 0 ? (
+                        {table.getRowModel().rows.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center">
+                                <TableCell colSpan={columns.length} className="text-center">
                                     No contacts found.
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            contacts.map((contact) => {
-                                const isViewed = viewedContacts.has(contact.id)
-                                const fullName = [contact.first_name, contact.last_name]
-                                    .filter(Boolean)
-                                    .join(' ') || '-'
-
-                                return (
-                                    <TableRow key={contact.id}>
-                                        <TableCell className="font-medium">
-                                            {isViewed ? fullName : '•••••'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {isViewed ? contact.email || '-' : '•••••'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {isViewed ? contact.phone || '-' : '•••••'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {isViewed ? contact.title || '-' : '•••••'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {isViewed ? contact.department || '-' : '•••••'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {contact.agency?.name || '-'}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            {isViewed ? (
-                                                <Badge variant="secondary" className="gap-1">
-                                                    <Eye className="h-3 w-3" />
-                                                    Viewed
-                                                </Badge>
-                                            ) : (
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    onClick={() => handleViewContact(contact.id)}
-                                                    className="gap-1"
-                                                >
-                                                    <EyeOff className="h-3 w-3" />
-                                                    View
-                                                </Button>
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id}>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
                                             )}
                                         </TableCell>
-                                    </TableRow>
-                                )
-                            })
+                                    ))}
+                                </TableRow>
+                            ))
                         )}
                     </TableBody>
                 </Table>

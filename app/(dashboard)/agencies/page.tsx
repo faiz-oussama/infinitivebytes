@@ -1,7 +1,35 @@
 import prisma from '@/lib/db'
 import { AgenciesTable } from '@/components/tables/agencies-table'
+import { unstable_cache } from 'next/cache'
 
 export const dynamic = 'force-dynamic'
+
+const getAgencies = unstable_cache(
+    async (search: string, skip: number, perPage: number) => {
+        const where = search
+            ? {
+                OR: [
+                    { name: { contains: search, mode: 'insensitive' as const } },
+                    { state: { contains: search, mode: 'insensitive' as const } },
+                    { type: { contains: search, mode: 'insensitive' as const } },
+                    { county: { contains: search, mode: 'insensitive' as const } },
+                ],
+            }
+            : {}
+
+        return await Promise.all([
+            prisma.agency.findMany({
+                where,
+                skip,
+                take: perPage,
+                orderBy: { name: 'asc' },
+            }),
+            prisma.agency.count({ where }),
+        ])
+    },
+    ['agencies'],
+    { revalidate: 60, tags: ['agencies'] }
+)
 
 export default async function AgenciesPage({
     searchParams,
@@ -14,26 +42,7 @@ export default async function AgenciesPage({
     const perPage = 20
     const skip = (page - 1) * perPage
 
-    const where = search
-        ? {
-            OR: [
-                { name: { contains: search, mode: 'insensitive' as const } },
-                { state: { contains: search, mode: 'insensitive' as const } },
-                { type: { contains: search, mode: 'insensitive' as const } },
-                { county: { contains: search, mode: 'insensitive' as const } },
-            ],
-        }
-        : {}
-
-    const [agencies, total] = await Promise.all([
-        prisma.agency.findMany({
-            where,
-            skip,
-            take: perPage,
-            orderBy: { name: 'asc' },
-        }),
-        prisma.agency.count({ where }),
-    ])
+    const [agencies, total] = await getAgencies(search, skip, perPage)
 
     const totalPages = Math.ceil(total / perPage)
 

@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { AlertCircle } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 type UpgradePromptProps = {
     open: boolean
@@ -18,6 +19,13 @@ type UpgradePromptProps = {
 }
 
 export function UpgradePrompt({ open, onOpenChange, viewsToday }: UpgradePromptProps) {
+    const router = useRouter()
+
+    const handleUpgrade = () => {
+        onOpenChange(false)
+        router.push('/pricing')
+    }
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md">
@@ -58,7 +66,9 @@ export function UpgradePrompt({ open, onOpenChange, viewsToday }: UpgradePromptP
                     </CardContent>
                 </Card>
                 <div className="flex flex-col gap-2">
-                    <Button className="w-full">Upgrade Now</Button>
+                    <Button onClick={handleUpgrade} className="w-full">
+                        Upgrade Now
+                    </Button>
                     <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full">
                         Maybe Later
                     </Button>

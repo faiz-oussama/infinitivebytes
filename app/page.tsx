@@ -1,12 +1,13 @@
-import { redirect } from 'next/navigation'
-import { auth } from '@clerk/nextjs/server'
+'use client'
 
-export default async function Home() {
-  const { userId } = await auth()
+import { Hero } from "@/components/hero";
+import { Leva } from "leva";
 
-  if (userId) {
-    redirect('/agencies')
-  } else {
-    redirect('/sign-in')
-  }
+export default function Home() {
+  return (
+    <>
+      <Hero />
+      <Leva hidden />
+    </>
+  );
 }

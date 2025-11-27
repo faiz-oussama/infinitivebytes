@@ -21,7 +21,7 @@ export async function POST(request: Request) {
         if (isAtLimit) {
             return NextResponse.json(
                 { error: 'Daily limit reached' },
-                { status: 429 }
+                { status: 403 }
             )
         }
 
@@ -29,7 +29,6 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ success: true })
     } catch (error) {
-        console.error('Error recording contact view:', error)
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }

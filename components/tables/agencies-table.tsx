@@ -2,6 +2,17 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import {
+    useReactTable,
+    getCoreRowModel,
+    getSortedRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    flexRender,
+    createColumnHelper,
+    SortingState,
+    ColumnFiltersState,
+} from '@tanstack/react-table'
 import { Input } from '@/components/ui/input'
 import {
     Table,
@@ -12,7 +23,7 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search, ArrowUpDown } from 'lucide-react'
 
 type Agency = {
     id: string
@@ -31,6 +42,8 @@ type AgenciesTableProps = {
     searchQuery: string
 }
 
+const columnHelper = createColumnHelper<Agency>()
+
 export function AgenciesTable({
     agencies,
     currentPage,
@@ -39,6 +52,104 @@ export function AgenciesTable({
 }: AgenciesTableProps) {
     const router = useRouter()
     const [search, setSearch] = useState(searchQuery)
+    const [sorting, setSorting] = useState<SortingState>([])
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+
+    const columns = [
+        columnHelper.accessor('name', {
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                    className="hover:bg-transparent p-0"
+                >
+                    Name
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
+        }),
+        columnHelper.accessor('state', {
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                    className="hover:bg-transparent p-0"
+                >
+                    State
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            cell: ({ row }) => row.original.state || '-',
+        }),
+        columnHelper.accessor('type', {
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                    className="hover:bg-transparent p-0"
+                >
+                    Type
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            cell: ({ row }) => row.original.type || '-',
+        }),
+        columnHelper.accessor('population', {
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                    className="hover:bg-transparent p-0"
+                >
+                    Population
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            cell: ({ row }) =>
+                row.original.population ? row.original.population.toLocaleString() : '-',
+        }),
+        columnHelper.accessor('county', {
+            header: 'County',
+            cell: ({ row }) => row.original.county || '-',
+        }),
+        columnHelper.accessor('website', {
+            header: 'Website',
+            cell: ({ row }) =>
+                row.original.website ? (
+                    <a
+                        href={row.original.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                    >
+                        Visit
+                    </a>
+                ) : (
+                    '-'
+                ),
+        }),
+    ]
+
+    const table = useReactTable({
+        data: agencies,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        state: {
+            sorting,
+            columnFilters,
+        },
+        initialState: {
+            pagination: {
+                pageSize: 20,
+            },
+        },
+    })
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault()
@@ -72,48 +183,39 @@ export function AgenciesTable({
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>State</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Population</TableHead>
-                            <TableHead>County</TableHead>
-                            <TableHead>Website</TableHead>
-                        </TableRow>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                header.column.columnDef.header,
+                                                header.getContext()
+                                            )}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        ))}
                     </TableHeader>
                     <TableBody>
-                        {agencies.length === 0 ? (
+                        {table.getRowModel().rows.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center">
+                                <TableCell colSpan={columns.length} className="text-center">
                                     No agencies found.
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            agencies.map((agency) => (
-                                <TableRow key={agency.id}>
-                                    <TableCell className="font-medium">{agency.name}</TableCell>
-                                    <TableCell>{agency.state || '-'}</TableCell>
-                                    <TableCell>{agency.type || '-'}</TableCell>
-                                    <TableCell>
-                                        {agency.population
-                                            ? agency.population.toLocaleString()
-                                            : '-'}
-                                    </TableCell>
-                                    <TableCell>{agency.county || '-'}</TableCell>
-                                    <TableCell>
-                                        {agency.website ? (
-                                            <a
-                                                href={agency.website}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-blue-600 hover:underline"
-                                            >
-                                                Visit
-                                            </a>
-                                        ) : (
-                                            '-'
-                                        )}
-                                    </TableCell>
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id}>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </TableCell>
+                                    ))}
                                 </TableRow>
                             ))
                         )}

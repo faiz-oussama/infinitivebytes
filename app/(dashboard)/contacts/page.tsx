@@ -1,9 +1,44 @@
 import prisma from '@/lib/db'
 import { getCurrentUserId, checkDailyLimit } from '@/lib/daily-limit'
 import { ContactsTable } from '@/components/tables/contacts-table'
-
+import { unstable_cache } from 'next/cache'
 
 export const dynamic = 'force-dynamic'
+
+const getContacts = unstable_cache(
+    async (search: string, skip: number, perPage: number) => {
+        const where = search
+            ? {
+                OR: [
+                    { first_name: { contains: search, mode: 'insensitive' as const } },
+                    { last_name: { contains: search, mode: 'insensitive' as const } },
+                    { email: { contains: search, mode: 'insensitive' as const } },
+                    { title: { contains: search, mode: 'insensitive' as const } },
+                    { department: { contains: search, mode: 'insensitive' as const } },
+                ],
+            }
+            : {}
+
+        return await Promise.all([
+            prisma.contact.findMany({
+                where,
+                skip,
+                take: perPage,
+                orderBy: { first_name: 'asc' },
+                include: {
+                    agency: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            }),
+            prisma.contact.count({ where }),
+        ])
+    },
+    ['contacts'],
+    { revalidate: 60, tags: ['contacts'] }
+)
 
 export default async function ContactsPage({
     searchParams,
@@ -19,34 +54,7 @@ export default async function ContactsPage({
     const userId = await getCurrentUserId()
     const { isAtLimit, viewsToday, remaining } = await checkDailyLimit(userId)
 
-    const where = search
-        ? {
-            OR: [
-                { first_name: { contains: search, mode: 'insensitive' as const } },
-                { last_name: { contains: search, mode: 'insensitive' as const } },
-                { email: { contains: search, mode: 'insensitive' as const } },
-                { title: { contains: search, mode: 'insensitive' as const } },
-                { department: { contains: search, mode: 'insensitive' as const } },
-            ],
-        }
-        : {}
-
-    const [contacts, total] = await Promise.all([
-        prisma.contact.findMany({
-            where,
-            skip,
-            take: perPage,
-            orderBy: { first_name: 'asc' },
-            include: {
-                agency: {
-                    select: {
-                        name: true,
-                    },
-                },
-            },
-        }),
-        prisma.contact.count({ where }),
-    ])
+    const [contacts, total] = await getContacts(search, skip, perPage)
 
     const totalPages = Math.ceil(total / perPage)
 

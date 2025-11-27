@@ -13,10 +13,16 @@ export default function DashboardLayout({
             <nav className="border-b">
                 <div className="flex h-16 items-center px-4 md:px-8">
                     <div className="flex items-center gap-6 flex-1">
-                        <Link href="/agencies" className="text-lg font-semibold">
+                        <Link href="/dashboard" className="text-lg font-semibold">
                             Dashboard
                         </Link>
                         <div className="flex gap-4">
+                            <Link
+                                href="/dashboard"
+                                className="text-sm font-medium transition-colors hover:text-primary"
+                            >
+                                Overview
+                            </Link>
                             <Link
                                 href="/agencies"
                                 className="text-sm font-medium transition-colors hover:text-primary"
@@ -28,6 +34,12 @@ export default function DashboardLayout({
                                 className="text-sm font-medium transition-colors hover:text-primary"
                             >
                                 Contacts
+                            </Link>
+                            <Link
+                                href="/pricing"
+                                className="text-sm font-medium transition-colors hover:text-primary"
+                            >
+                                Pricing
                             </Link>
                         </div>
                     </div>
