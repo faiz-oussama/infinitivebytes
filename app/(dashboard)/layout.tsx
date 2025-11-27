@@ -1,5 +1,6 @@
 import { UserButton } from '@clerk/nextjs'
 import { DailyLimitHeader } from '@/components/daily-limit-header'
+import { Logo } from '@/components/logo'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 
@@ -10,44 +11,41 @@ export default function DashboardLayout({
 }) {
     return (
         <div className="min-h-screen bg-background">
-            <nav className="border-b">
-                <div className="flex h-16 items-center px-4 md:px-8">
-                    <div className="flex items-center gap-6 flex-1">
-                        <Link href="/dashboard" className="text-lg font-semibold">
-                            Dashboard
-                        </Link>
-                        <div className="flex gap-4">
+            <div className="fixed z-50 pt-4 md:pt-6 top-0 left-0 w-full bg-background/80 backdrop-blur-sm border-b">
+                <header className="flex items-center justify-between container mx-auto px-4 md:px-8 pb-4">
+                    <Link href="/dashboard">
+                        <Logo className="w-[50px] md:w-[60px]" />
+                    </Link>
+                    <nav className="flex max-lg:hidden absolute left-1/2 -translate-x-1/2 items-center justify-center gap-x-10">
+                        {[
+                            { name: "Overview", href: "/dashboard" },
+                            { name: "Agencies", href: "/agencies" },
+                            { name: "Contacts", href: "/contacts" },
+                            { name: "Pricing", href: "/pricing" },
+                        ].map((item) => (
                             <Link
-                                href="/dashboard"
-                                className="text-sm font-medium transition-colors hover:text-primary"
+                                className="uppercase inline-block font-mono text-foreground/60 hover:text-foreground/100 duration-150 transition-colors ease-out"
+                                href={item.href}
+                                key={item.name}
                             >
-                                Overview
+                                {item.name}
                             </Link>
-                            <Link
-                                href="/agencies"
-                                className="text-sm font-medium transition-colors hover:text-primary"
-                            >
-                                Agencies
-                            </Link>
-                            <Link
-                                href="/contacts"
-                                className="text-sm font-medium transition-colors hover:text-primary"
-                            >
-                                Contacts
-                            </Link>
-                            <Link
-                                href="/pricing"
-                                className="text-sm font-medium transition-colors hover:text-primary"
-                            >
-                                Pricing
-                            </Link>
-                        </div>
+                        ))}
+                    </nav>
+                    <div className="flex items-center gap-4">
+                        <DailyLimitHeader />
+                        <UserButton
+                            afterSignOutUrl="/sign-in"
+                            appearance={{
+                                elements: {
+                                    avatarBox: "w-10 h-10"
+                                }
+                            }}
+                        />
                     </div>
-                    <DailyLimitHeader />
-                    <UserButton afterSignOutUrl="/sign-in" />
-                </div>
-            </nav>
-            <main className="container mx-auto py-6 px-4 md:px-8">
+                </header>
+            </div>
+            <main className="container mx-auto py-6 px-4 md:px-8 pt-28">
                 {children}
             </main>
         </div>
