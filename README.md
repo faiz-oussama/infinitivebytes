@@ -1,168 +1,232 @@
-# Dashboard Application
+<div align="center">
+  
+# 🚀 Agency Intelligence Dashboard
 
-A Next.js 15 dashboard application with user authentication and daily contact view limits.
+**Modern full-stack application for agency & contact data management with intelligent daily limits**
 
-## Features
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma)](https://www.prisma.io/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 
-- **User Authentication**: Secure authentication using Clerk
-- **Agencies Page**: View and search through all agencies with pagination
-- **Contacts Page**: View contact information with daily limit enforcement
-- **Daily Limit**: Users can view up to 50 contacts per day (resets at midnight UTC)
-- **Upgrade Prompt**: Modal prompt when daily limit is reached
-- **Clean UI**: Built with shadcn/ui components for a minimalistic design
+[Live Demo](https://infinitivebytes.vercel.app) · [Report Bug](https://github.com/faiz-oussama/infinitivebytes/issues)
 
-## Tech Stack
+</div>
 
-- **Framework**: Next.js 15 (App Router)
-- **Authentication**: Clerk
-- **Database**: PostgreSQL with Prisma ORM
-- **UI Library**: shadcn/ui (Tailwind CSS)
-- **Language**: TypeScript
+---
 
-## Setup Instructions
+## ✨ Features
+
+- 🔐 **Authentication** – Clerk-powered OAuth with session management
+- 📊 **Analytics Dashboard** – Real-time stats with interactive charts (Recharts)
+- 🏢 **Agency Management** – Advanced table with search, sort, and pagination
+- 👥 **Contact Tracking** – Daily view limits (50/day) with usage analytics
+- 🎨 **3D Landing Page** – WebGL animations using Three.js & React Three Fiber
+- 🌙 **Theme Support** – Light/dark modes with Tailwind CSS
+- ⚡ **Performance** – Server Components, React Compiler, edge-optimized
+- 📱 **Responsive** – Mobile-first design with glassmorphism UI
+
+## 🏗️ Architecture
+
+![Architecture Diagram](./architecture.png)
+
+### Tech Stack
+
+```
+Frontend          Backend           Database          Auth
+─────────         ─────────         ─────────         ─────────
+Next.js 16        API Routes        PostgreSQL        Clerk
+React 19          Prisma ORM        Neon Serverless   OAuth
+TypeScript        Server Actions    Connection Pool   Sessions
+Tailwind CSS 4    Edge Runtime      Query Cache       Protected Routes
+Three.js          Serverless        Prisma Accelerate User Management
+```
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ installed
-- PostgreSQL database (local or cloud)
-- Clerk account (free tier available)
+- Node.js 18+
+- PostgreSQL database (or [Neon](https://neon.tech) free tier)
+- [Clerk](https://clerk.com) account
 
-### 1. Clone and Install
+### Installation
 
 ```bash
-cd dashboard-app
+# Clone repository
+git clone https://github.com/faiz-oussama/infinitivebytes.git
+cd infinitivebytes
+
+# Install dependencies
 npm install
-```
 
-### 2. Environment Variables
+# Set up environment variables
+cp env.template .env.local
+# Add your Clerk & Database credentials
 
-Create a `.env` file in the root directory with the following variables (see `ENV_TEMPLATE.md` for reference):
+# Push database schema
+npm run db:push
 
-```env
-# Clerk Authentication
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-CLERK_SECRET_KEY=your_clerk_secret_key
+# (Optional) Seed with sample data
+npm run db:seed
 
-# Clerk URLs
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/agencies
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/agencies
-
-# Database
-DATABASE_URL="postgresql://username:password@localhost:5432/dashboard_db?schema=public"
-```
-
-**Getting Clerk Keys**:
-1. Sign up at [clerk.com](https://clerk.com)
-2. Create a new application
-3. Copy the API keys from the dashboard
-
-### 3. Database Setup
-
-Push the Prisma schema to your database:
-
-```bash
-npx prisma db push
-```
-
-### 4. Seed Database (Optional)
-
-To import the CSV data:
-
-```bash
-npx tsx scripts/seed.ts
-```
-
-This will import agencies and contacts from the CSV files in the parent directory.
-
-### 5. Run Development Server
-
-```bash
+# Start development server
 npm run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000)
 
-## Database Schema
+## 📦 Key Dependencies
 
-### Agency
-- Stores agency information (name, state, type, population, etc.)
+| Package | Purpose |
+|---------|---------|
+| `@clerk/nextjs` | Authentication & user management |
+| `@prisma/client` | Type-safe database ORM |
+| `@neondatabase/serverless` | Serverless PostgreSQL connection |
+| `@tanstack/react-table` | Advanced table functionality |
+| `@react-three/fiber` | 3D WebGL rendering |
+| `recharts` | Data visualization & charts |
+| `shadcn/ui` | Accessible UI components |
 
-### Contact
-- Stores contact information (name, email, phone, title, department)
-- Links to Agency via `agency_id`
 
-### ContactView
-- Tracks each contact view by user
-- Used to enforce the 50 views/day limit
+## 🗄️ Database Schema
 
-## Features Overview
+```prisma
+User ────┐
+         │ 1:N
+         ▼
+    ContactView
+         │ N:1
+         ▼
+    Contact ───N:1──▶ Agency
+```
 
-### Authentication
-- Sign up and sign in pages powered by Clerk
-- Protected routes (cannot access dashboard without authentication)
-- User menu with sign-out option
+**Models**: User, Agency, Contact, ContactView
 
-### Agencies Page
-- Table view of all agencies
-- Search by name, state, type, or county
-- Pagination (20 per page)
-- Responsive design
+## 🔑 Environment Variables
 
-### Contacts Page
-- Table view of contacts with masked data
-- Click "View" button to reveal contact details (counts toward daily limit)
-- Real-time limit counter showing remaining views
-- Search by name, email, title, or department
-- Pagination (20 per page)
-- Upgrade prompt when limit is reached
+```env
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
 
-## Deployment
+# Database (Neon PostgreSQL)
+DATABASE_URL=postgresql://user:pass@host/db
+DIRECT_URL=postgresql://user:pass@host/db
+```
 
-### Vercel (Recommended)
-
-1. Push your code to GitHub
-2. Import the project in Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy
-
-### Environment Variables for Production
-
-Make sure to set all environment variables in your deployment platform:
-- Clerk API keys (different from development)
-- Production database URL
-
-## Project Structure
+## 📁 Project Structure
 
 ```
 dashboard-app/
 ├── app/
-│   ├── (dashboard)/          # Protected dashboard routes
-│   │   ├── agencies/         # Agencies page
-│   │   ├── contacts/         # Contacts page
-│   │   └── layout.tsx        # Dashboard layout with nav
-│   ├── api/                  # API routes
-│   │   └── contacts/view/    # Contact view tracking endpoint
-│   ├── sign-in/              # Sign-in page
-│   ├── sign-up/              # Sign-up page
-│   └── layout.tsx            # Root layout with Clerk
+│   ├── (dashboard)/       # Protected routes (SSR)
+│   │   ├── dashboard/     # Overview with analytics
+│   │   ├── agencies/      # Agency table view
+│   │   └── contacts/      # Contact management
+│   ├── api/               # Backend API routes
+│   ├── features/          # Public features page
+│   ├── pricing/           # Pricing page
+│   └── layout.tsx         # Root layout + Clerk
 ├── components/
-│   ├── tables/               # Table components
-│   ├── ui/                   # shadcn/ui components
-│   └── upgrade-prompt.tsx    # Upgrade modal
+│   ├── charts/            # Recharts visualizations
+│   ├── tables/            # TanStack tables
+│   └── ui/                # shadcn components
 ├── lib/
-│   ├── db.ts                 # Prisma client
-│   ├── daily-limit.ts        # Limit checking utilities
-│   └── utils.ts              # General utilities
-├── prisma/
-│   └── schema.prisma         # Database schema
-├── scripts/
-│   └── seed.ts               # Database seeding script
-└── middleware.ts             # Clerk route protection
-
+│   ├── db.ts              # Prisma client
+│   └── daily-limit.ts     # View tracking logic
+└── prisma/
+    └── schema.prisma      # Database schema
 ```
 
-## License
+## 🎯 Core Features
 
-MIT
+### Daily Limit System
+- Server-side enforcement (50 views/day)
+- Real-time counter with badge UI
+- Auto-reset at midnight UTC
+- Indexed queries for performance
+
+### Authentication Flow
+- OAuth providers (Google, GitHub, etc.)
+- Protected routes via middleware
+- Session management with Clerk
+- Custom post-login redirects
+
+### Data Management
+- Server-side pagination
+- Advanced search & filtering
+- Real-time updates
+- Optimistic UI with React Server Components
+
+## 🌐 Deployment
+
+### Vercel (Recommended)
+
+```bash
+# Deploy to production
+vercel --prod
+
+# Environment variables required:
+# - All Clerk keys
+# - DATABASE_URL
+# - DIRECT_URL (for migrations)
+```
+
+### Environment Setup
+
+Add these in Vercel Dashboard → Settings → Environment Variables:
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `CLERK_SECRET_KEY`
+- `DATABASE_URL`
+- `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard`
+
+## 🛠️ Development
+
+```bash
+# Development server
+npm run dev
+
+# Production build
+npm run build
+
+# Database management
+npm run db:push      # Push schema
+npm run db:studio    # Open Prisma Studio
+npm run db:generate  # Generate Prisma Client
+
+# Linting
+npm run lint
+```
+
+## 🎨 Design System
+
+- **Colors**: HSL-based Tailwind tokens
+- **Typography**: Geist font family
+- **Components**: Radix UI primitives
+- **Animations**: Tailwind CSS animations
+- **Icons**: Lucide React
+
+## 📈 Performance
+
+- **Server Components** – Reduced client bundle
+- **React Compiler** – Auto optimization
+- **Edge Runtime** – Global low-latency
+- **Query Caching** – Prisma Accelerate
+- **Connection Pooling** – Neon serverless
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) for details
+
+---
+
+<div align="center">
+
+**Built with ❤️ using Next.js, React, and TypeScript**
+
+[⭐ Star this repo](https://github.com/faiz-oussama/infinitivebytes) · [🐛 Report Issues](https://github.com/faiz-oussama/infinitivebytes/issues)
+
+</div>
