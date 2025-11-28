@@ -16,6 +16,7 @@ model User {
   updatedAt    DateTime      @updatedAt
   
   contactViews ContactView[]
+  savedContacts SavedContact[]
 }
 
 model Agency {
@@ -66,6 +67,7 @@ model Contact {
   firm_id          String?
   
   views            ContactView[]
+  savedBy          SavedContact[]
 
   @@map("contacts")
 }
@@ -81,4 +83,18 @@ model ContactView {
 
   @@map("contact_views")
   @@index([user_id, viewed_at])
+}
+
+model SavedContact {
+  id         String   @id @default(cuid())
+  user_id    String
+  contact_id String
+  saved_at   DateTime @default(now())
+  
+  user       User     @relation(fields: [user_id], references: [id])
+  contact    Contact  @relation(fields: [contact_id], references: [id])
+
+  @@unique([user_id, contact_id])
+  @@map("saved_contacts")
+  @@index([user_id, saved_at])
 }

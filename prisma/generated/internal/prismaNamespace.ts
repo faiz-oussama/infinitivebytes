@@ -387,7 +387,8 @@ export const ModelName = {
   User: 'User',
   Agency: 'Agency',
   Contact: 'Contact',
-  ContactView: 'ContactView'
+  ContactView: 'ContactView',
+  SavedContact: 'SavedContact'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -403,7 +404,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "agency" | "contact" | "contactView"
+    modelProps: "user" | "agency" | "contact" | "contactView" | "savedContact"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -703,6 +704,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SavedContact: {
+      payload: Prisma.$SavedContactPayload<ExtArgs>
+      fields: Prisma.SavedContactFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SavedContactFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedContactPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SavedContactFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedContactPayload>
+        }
+        findFirst: {
+          args: Prisma.SavedContactFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedContactPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SavedContactFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedContactPayload>
+        }
+        findMany: {
+          args: Prisma.SavedContactFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedContactPayload>[]
+        }
+        create: {
+          args: Prisma.SavedContactCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedContactPayload>
+        }
+        createMany: {
+          args: Prisma.SavedContactCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SavedContactCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedContactPayload>[]
+        }
+        delete: {
+          args: Prisma.SavedContactDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedContactPayload>
+        }
+        update: {
+          args: Prisma.SavedContactUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedContactPayload>
+        }
+        deleteMany: {
+          args: Prisma.SavedContactDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SavedContactUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SavedContactUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedContactPayload>[]
+        }
+        upsert: {
+          args: Prisma.SavedContactUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedContactPayload>
+        }
+        aggregate: {
+          args: Prisma.SavedContactAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSavedContact>
+        }
+        groupBy: {
+          args: Prisma.SavedContactGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SavedContactGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SavedContactCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SavedContactCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -808,6 +883,16 @@ export const ContactViewScalarFieldEnum = {
 } as const
 
 export type ContactViewScalarFieldEnum = (typeof ContactViewScalarFieldEnum)[keyof typeof ContactViewScalarFieldEnum]
+
+
+export const SavedContactScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  contact_id: 'contact_id',
+  saved_at: 'saved_at'
+} as const
+
+export type SavedContactScalarFieldEnum = (typeof SavedContactScalarFieldEnum)[keyof typeof SavedContactScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -978,6 +1063,7 @@ export type GlobalOmitConfig = {
   agency?: Prisma.AgencyOmit
   contact?: Prisma.ContactOmit
   contactView?: Prisma.ContactViewOmit
+  savedContact?: Prisma.SavedContactOmit
 }
 
 /* Types for Logging */

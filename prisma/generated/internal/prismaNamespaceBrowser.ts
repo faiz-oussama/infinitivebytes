@@ -54,7 +54,8 @@ export const ModelName = {
   User: 'User',
   Agency: 'Agency',
   Contact: 'Contact',
-  ContactView: 'ContactView'
+  ContactView: 'ContactView',
+  SavedContact: 'SavedContact'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -139,6 +140,16 @@ export const ContactViewScalarFieldEnum = {
 } as const
 
 export type ContactViewScalarFieldEnum = (typeof ContactViewScalarFieldEnum)[keyof typeof ContactViewScalarFieldEnum]
+
+
+export const SavedContactScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  contact_id: 'contact_id',
+  saved_at: 'saved_at'
+} as const
+
+export type SavedContactScalarFieldEnum = (typeof SavedContactScalarFieldEnum)[keyof typeof SavedContactScalarFieldEnum]
 
 
 export const SortOrder = {

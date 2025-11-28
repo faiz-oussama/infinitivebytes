@@ -22,6 +22,7 @@ export default function DashboardLayout({
                             { name: "Overview", href: "/dashboard" },
                             { name: "Agencies", href: "/agencies" },
                             { name: "Contacts", href: "/contacts" },
+                            { name: "Saved", href: "/saved" },
                             { name: "Pricing", href: "/pricing" },
                         ].map((item) => (
                             <Link

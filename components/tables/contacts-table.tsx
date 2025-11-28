@@ -202,17 +202,70 @@ export function ContactsTable({
             cell: ({ row }) => row.original.agency?.name || '-',
         }),
         columnHelper.display({
-            id: 'action',
-            header: () => <div className="text-right">Action</div>,
+            id: 'actions',
+            header: () => <div className="text-right">Actions</div>,
             cell: ({ row }) => {
                 const isViewed = viewedContacts.has(row.original.id)
+                const contact = row.original
+
+                const handleCopyEmail = () => {
+                    if (contact.email) {
+                        navigator.clipboard.writeText(contact.email)
+                        toast.success('Email copied to clipboard')
+                    } else {
+                        toast.error('No email available')
+                    }
+                }
+
+                const handleSaveContact = async () => {
+                    try {
+                        const response = await fetch('/api/contacts/save', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ contactId: contact.id }),
+                        })
+
+                        if (response.ok) {
+                            toast.success('Contact saved successfully')
+                            router.refresh()
+                        } else {
+                            const data = await response.json()
+                            toast.error(data.error || 'Failed to save contact')
+                        }
+                    } catch (error) {
+                        toast.error('An error occurred while saving the contact')
+                    }
+                }
+
                 return (
-                    <div className="text-right">
+                    <div className="flex items-center justify-end gap-2">
                         {isViewed ? (
-                            <Badge variant="secondary" className="gap-1">
-                                <Eye className="h-3 w-3" />
-                                Viewed
-                            </Badge>
+                            <>
+                                <Badge variant="secondary" className="gap-1">
+                                    <Eye className="h-3 w-3" />
+                                    Viewed
+                                </Badge>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                            <MoreHorizontal className="h-4 w-4" />
+                                            <span className="sr-only">Open menu</span>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem onClick={handleCopyEmail}>
+                                            <Copy className="mr-2 h-4 w-4" />
+                                            Copy Email
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={handleSaveContact}>
+                                            <Star className="mr-2 h-4 w-4" />
+                                            Save Contact
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </>
                         ) : (
                             <Button
                                 size="sm"
@@ -224,56 +277,6 @@ export function ContactsTable({
                                 View
                             </Button>
                         )}
-                    </div>
-                )
-            },
-        }),
-        columnHelper.display({
-            id: 'actions',
-            header: () => <div className="text-center">Actions</div>,
-            cell: ({ row }) => {
-                const isViewed = viewedContacts.has(row.original.id)
-                const contact = row.original
-
-                if (!isViewed) {
-                    return null
-                }
-
-                const handleCopyEmail = () => {
-                    if (contact.email) {
-                        navigator.clipboard.writeText(contact.email)
-                        toast.success('Email copied to clipboard')
-                    } else {
-                        toast.error('No email available')
-                    }
-                }
-
-                const handleSaveContact = () => {
-                    toast.success('Contact saved')
-                }
-
-                return (
-                    <div className="text-center">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                    <span className="sr-only">Open menu</span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={handleCopyEmail}>
-                                    <Copy className="mr-2 h-4 w-4" />
-                                    Copy Email
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={handleSaveContact}>
-                                    <Star className="mr-2 h-4 w-4" />
-                                    Save Contact
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
                     </div>
                 )
             },
@@ -330,20 +333,19 @@ export function ContactsTable({
             </form>
 
             <div className="rounded-md border">
-                <Table className="table-fixed w-full">
+                <Table className="table-fixed w-full text-sm">
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     const widthClass =
-                                        header.id === 'name' ? 'w-[13%]' :
-                                            header.id === 'email' ? 'w-[20%]' :
+                                        header.id === 'name' ? 'w-[12%]' :
+                                            header.id === 'email' ? 'w-[22%]' :
                                                 header.id === 'phone' ? 'w-[11%]' :
-                                                    header.id === 'title' ? 'w-[17%]' :
-                                                        header.id === 'department' ? 'w-[12%]' :
-                                                            header.id === 'agency.name' ? 'w-[11%]' :
-                                                                header.id === 'action' ? 'w-[10%]' :
-                                                                    'w-[6%]'
+                                                    header.id === 'title' ? 'w-[18%]' :
+                                                        header.id === 'department' ? 'w-[13%]' :
+                                                            header.id === 'agency.name' ? 'w-[12%]' :
+                                                                'w-[12%]'
                                     return (
                                         <TableHead key={header.id} className={widthClass}>
                                             {header.isPlaceholder

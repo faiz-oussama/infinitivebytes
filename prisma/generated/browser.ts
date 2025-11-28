@@ -37,3 +37,8 @@ export type Contact = Prisma.ContactModel
  * 
  */
 export type ContactView = Prisma.ContactViewModel
+/**
+ * Model SavedContact
+ * 
+ */
+export type SavedContact = Prisma.SavedContactModel

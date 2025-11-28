@@ -38,15 +38,15 @@ export function UpgradePrompt({ open, onOpenChange, viewsToday }: UpgradePromptP
                         You've reached your daily limit of 50 contact views
                     </DialogDescription>
                 </DialogHeader>
-                <Card className="border-amber-200 bg-amber-50">
+                <Card className="border-amber-500/20 bg-amber-500/10 dark:bg-amber-500/5">
                     <CardContent className="pt-6">
                         <div className="space-y-4">
                             <div className="text-center">
-                                <p className="text-2xl font-bold text-amber-900">{viewsToday} / 50</p>
-                                <p className="text-sm text-amber-700">Views used today</p>
+                                <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{viewsToday} / 50</p>
+                                <p className="text-sm text-amber-600/80 dark:text-amber-400/80">Views used today</p>
                             </div>
                             <div className="space-y-2">
-                                <h4 className="font-semibold text-sm">Upgrade to Premium for:</h4>
+                                <h4 className="font-semibold text-sm text-foreground">Upgrade to Premium for:</h4>
                                 <ul className="space-y-1 text-sm text-muted-foreground">
                                     <li className="flex items-center gap-2">
                                         <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />

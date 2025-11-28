@@ -24,7 +24,6 @@ export function Particles({
   ...props
 }: {
   speed: number;
-  // fov: number
   aperture: number;
   focus: number;
   size: number;

@@ -58,7 +58,6 @@ export default async function ContactsPage({
     const [contacts, total] = await getContacts(search, skip, perPage)
     const totalPages = Math.ceil(total / perPage)
 
-    // Fetch viewed contacts for this user
     const viewedContacts = await prisma.contactView.findMany({
         where: { user_id: userId },
         select: { contact_id: true },
