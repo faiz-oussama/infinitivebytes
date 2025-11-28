@@ -278,13 +278,13 @@ export function ContactsTable({
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     const widthClass =
-                                        header.id === 'name' ? 'w-[15%]' :
-                                            header.id === 'email' ? 'w-[20%]' :
-                                                header.id === 'phone' ? 'w-[12%]' :
+                                        header.id === 'name' ? 'w-[14%]' :
+                                            header.id === 'email' ? 'w-[22%]' :
+                                                header.id === 'phone' ? 'w-[11%]' :
                                                     header.id === 'title' ? 'w-[18%]' :
-                                                        header.id === 'department' ? 'w-[15%]' :
-                                                            header.id === 'agency.name' ? 'w-[15%]' :
-                                                                'w-[5%]'
+                                                        header.id === 'department' ? 'w-[13%]' :
+                                                            header.id === 'agency.name' ? 'w-[12%]' :
+                                                                'w-[10%]'
                                     return (
                                         <TableHead key={header.id} className={widthClass}>
                                             {header.isPlaceholder
