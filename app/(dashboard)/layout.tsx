@@ -14,7 +14,7 @@ export default function DashboardLayout({
             <div className="fixed z-50 pt-4 md:pt-6 top-0 left-0 w-full bg-background/80 backdrop-blur-sm border-b">
                 <header className="flex items-center justify-between container mx-auto px-4 md:px-8 pb-4">
                     <Link href="/dashboard">
-                        <Logo className="w-[50px] md:w-[60px]" />
+                        <Logo className="w-[50px] md:w-[60px] text-foreground" />
                     </Link>
                     <nav className="flex max-lg:hidden absolute left-1/2 -translate-x-1/2 items-center justify-center gap-x-10">
                         {[

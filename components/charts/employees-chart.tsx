@@ -29,12 +29,25 @@ export function EmployeesChart({ data }: EmployeesChartProps) {
                         tick={{ fill: 'hsl(var(--muted-foreground))' }}
                     />
                     <Tooltip
-                        contentStyle={{
-                            backgroundColor: 'hsl(var(--card))',
-                            border: '1px solid hsl(var(--border))',
-                            borderRadius: '6px',
+                        cursor={{ fill: 'hsl(var(--muted) / 0.3)' }}
+                        content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                                return (
+                                    <div className="rounded-lg border bg-card p-3 shadow-lg">
+                                        <p className="font-semibold text-foreground mb-1">
+                                            {payload[0].payload.name}
+                                        </p>
+                                        <p className="text-sm text-muted-foreground">
+                                            <span className="font-medium text-foreground">
+                                                {payload[0].value}
+                                            </span>
+                                            {' '}contacts
+                                        </p>
+                                    </div>
+                                )
+                            }
+                            return null
                         }}
-                        labelStyle={{ color: 'hsl(var(--foreground))' }}
                     />
                     <Bar dataKey="employees" radius={[4, 4, 0, 0]}>
                         {data.map((entry, index) => (
