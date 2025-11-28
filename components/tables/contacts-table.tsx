@@ -47,6 +47,7 @@ type ContactsTableProps = {
     userId: string
     viewsToday: number
     isAtLimit: boolean
+    viewedContactIds: string[]
 }
 
 const columnHelper = createColumnHelper<Contact>()
@@ -59,10 +60,11 @@ export function ContactsTable({
     userId,
     viewsToday,
     isAtLimit,
+    viewedContactIds,
 }: ContactsTableProps) {
     const router = useRouter()
     const [search, setSearch] = useState(searchQuery)
-    const [viewedContacts, setViewedContacts] = useState<Set<string>>(new Set())
+    const [viewedContacts, setViewedContacts] = useState<Set<string>>(new Set(viewedContactIds))
     const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
     const [localViewsToday, setLocalViewsToday] = useState(viewsToday)
     const [sorting, setSorting] = useState<SortingState>([])
@@ -270,20 +272,30 @@ export function ContactsTable({
             </form>
 
             <div className="rounded-md border">
-                <Table>
+                <Table className="table-fixed w-full">
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext()
-                                            )}
-                                    </TableHead>
-                                ))}
+                                {headerGroup.headers.map((header) => {
+                                    const widthClass =
+                                        header.id === 'name' ? 'w-[15%]' :
+                                            header.id === 'email' ? 'w-[20%]' :
+                                                header.id === 'phone' ? 'w-[12%]' :
+                                                    header.id === 'title' ? 'w-[18%]' :
+                                                        header.id === 'department' ? 'w-[15%]' :
+                                                            header.id === 'agency.name' ? 'w-[15%]' :
+                                                                'w-[5%]'
+                                    return (
+                                        <TableHead key={header.id} className={widthClass}>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
+                                        </TableHead>
+                                    )
+                                })}
                             </TableRow>
                         ))}
                     </TableHeader>
@@ -298,7 +310,7 @@ export function ContactsTable({
                             table.getRowModel().rows.map((row) => (
                                 <TableRow key={row.id}>
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell key={cell.id} className="break-words overflow-hidden">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()

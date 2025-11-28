@@ -40,6 +40,7 @@ const getContacts = unstable_cache(
     { revalidate: 60, tags: ['contacts'] }
 )
 
+
 export default async function ContactsPage({
     searchParams,
 }: {
@@ -55,8 +56,14 @@ export default async function ContactsPage({
     const { isAtLimit, viewsToday, remaining } = await checkDailyLimit(userId)
 
     const [contacts, total] = await getContacts(search, skip, perPage)
-
     const totalPages = Math.ceil(total / perPage)
+
+    // Fetch viewed contacts for this user
+    const viewedContacts = await prisma.contactView.findMany({
+        where: { user_id: userId },
+        select: { contact_id: true },
+    })
+    const viewedContactIds = viewedContacts.map((v) => v.contact_id)
 
     return (
         <div className="space-y-4">
@@ -75,6 +82,7 @@ export default async function ContactsPage({
                 userId={userId}
                 viewsToday={viewsToday}
                 isAtLimit={isAtLimit}
+                viewedContactIds={viewedContactIds}
             />
         </div>
     )

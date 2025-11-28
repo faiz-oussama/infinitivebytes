@@ -5,8 +5,8 @@ import { Toaster } from 'sonner'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Dashboard App',
-  description: 'Professional dashboard application',
+  title: 'Agency Insights',
+  description: 'Professional agency insights dashboard application',
 }
 
 export default function RootLayout({
