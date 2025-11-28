@@ -12,7 +12,7 @@ export default function SignUpPage() {
                 <ArrowLeft className="h-4 w-4" />
                 Back to Home
             </Link>
-            <SignUp />
+            <SignUp redirectUrl="/dashboard" />
         </div>
     )
 }

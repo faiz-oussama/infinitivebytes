@@ -12,7 +12,7 @@ export default function SignInPage() {
                 <ArrowLeft className="h-4 w-4" />
                 Back to Home
             </Link>
-            <SignIn />
+            <SignIn redirectUrl="/dashboard" />
         </div>
     )
 }
