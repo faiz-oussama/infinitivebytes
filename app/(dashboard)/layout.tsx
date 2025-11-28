@@ -1,6 +1,7 @@
 import { UserButton } from '@clerk/nextjs'
 import { DailyLimitHeader } from '@/components/daily-limit-header'
 import { Logo } from '@/components/logo'
+import { ThemeToggle } from '@/components/theme-toggle'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 
@@ -34,6 +35,7 @@ export default function DashboardLayout({
                     </nav>
                     <div className="flex items-center gap-4">
                         <DailyLimitHeader />
+                        <ThemeToggle />
                         <UserButton
                             afterSignOutUrl="/sign-in"
                             appearance={{

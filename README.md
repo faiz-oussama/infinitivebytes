@@ -1,6 +1,6 @@
 <div align="center">
   
-# 🚀 Agency Intelligence Dashboard
+# Agency Intelligence Dashboard
 
 **Modern full-stack application for agency & contact data management with intelligent daily limits**
 
@@ -43,7 +43,7 @@ Tailwind CSS 4    Edge Runtime      Query Cache       Protected Routes
 Three.js          Serverless        Prisma Accelerate User Management
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 

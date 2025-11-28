@@ -33,7 +33,7 @@ export function EmployeesChart({ data }: EmployeesChartProps) {
                         content={({ active, payload }) => {
                             if (active && payload && payload.length) {
                                 return (
-                                    <div className="rounded-lg border bg-card p-3 shadow-lg">
+                                    <div className="p-2">
                                         <p className="font-semibold text-foreground mb-1">
                                             {payload[0].payload.name}
                                         </p>

@@ -24,9 +24,17 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ChevronLeft, ChevronRight, Search, Eye, EyeOff, ArrowUpDown } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search, Eye, EyeOff, ArrowUpDown, MoreHorizontal, Copy, Star } from 'lucide-react'
 import { UpgradePrompt } from '@/components/upgrade-prompt'
 import { toast } from 'sonner'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 type Contact = {
     id: string
@@ -220,6 +228,56 @@ export function ContactsTable({
                 )
             },
         }),
+        columnHelper.display({
+            id: 'actions',
+            header: () => <div className="text-center">Actions</div>,
+            cell: ({ row }) => {
+                const isViewed = viewedContacts.has(row.original.id)
+                const contact = row.original
+
+                if (!isViewed) {
+                    return null
+                }
+
+                const handleCopyEmail = () => {
+                    if (contact.email) {
+                        navigator.clipboard.writeText(contact.email)
+                        toast.success('Email copied to clipboard')
+                    } else {
+                        toast.error('No email available')
+                    }
+                }
+
+                const handleSaveContact = () => {
+                    toast.success('Contact saved')
+                }
+
+                return (
+                    <div className="text-center">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">Open menu</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={handleCopyEmail}>
+                                    <Copy className="mr-2 h-4 w-4" />
+                                    Copy Email
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleSaveContact}>
+                                    <Star className="mr-2 h-4 w-4" />
+                                    Save Contact
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                )
+            },
+        }),
     ]
 
     const table = useReactTable({
@@ -278,13 +336,14 @@ export function ContactsTable({
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     const widthClass =
-                                        header.id === 'name' ? 'w-[14%]' :
-                                            header.id === 'email' ? 'w-[22%]' :
+                                        header.id === 'name' ? 'w-[13%]' :
+                                            header.id === 'email' ? 'w-[20%]' :
                                                 header.id === 'phone' ? 'w-[11%]' :
-                                                    header.id === 'title' ? 'w-[18%]' :
-                                                        header.id === 'department' ? 'w-[13%]' :
-                                                            header.id === 'agency.name' ? 'w-[12%]' :
-                                                                'w-[10%]'
+                                                    header.id === 'title' ? 'w-[17%]' :
+                                                        header.id === 'department' ? 'w-[12%]' :
+                                                            header.id === 'agency.name' ? 'w-[11%]' :
+                                                                header.id === 'action' ? 'w-[10%]' :
+                                                                    'w-[6%]'
                                     return (
                                         <TableHead key={header.id} className={widthClass}>
                                             {header.isPlaceholder
