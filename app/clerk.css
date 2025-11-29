@@ -1,0 +1,127 @@
+.cl-rootBox {
+    margin: 0 auto;
+}
+
+.cl-card {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+.cl-headerTitle {
+    color: hsl(var(--foreground));
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.cl-headerSubtitle {
+    color: hsl(var(--muted-foreground));
+    font-size: 0.875rem;
+}
+
+.cl-socialButtonsBlockButton {
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    border: 1px solid hsl(var(--border));
+}
+
+.cl-socialButtonsBlockButton:hover {
+    background-color: hsl(var(--secondary) / 0.8);
+}
+
+.cl-dividerLine {
+    background-color: hsl(var(--border));
+}
+
+.cl-dividerText {
+    color: hsl(var(--muted-foreground));
+}
+
+.cl-formButtonPrimary {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    transition: background-color 0.2s;
+}
+
+.cl-formButtonPrimary:hover {
+    background-color: hsl(var(--primary) / 0.9);
+}
+
+.cl-formFieldInput {
+    background-color: hsl(var(--background));
+    border-color: hsl(var(--input));
+    color: hsl(var(--foreground));
+    border-radius: 0.625rem;
+}
+
+.cl-formFieldInput:focus {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-color: hsl(var(--ring));
+}
+
+.cl-formFieldLabel {
+    color: hsl(var(--foreground));
+    font-weight: 500;
+}
+
+.cl-footerActionLink {
+    color: hsl(var(--primary));
+}
+
+.cl-footerActionLink:hover {
+    color: hsl(var(--primary) / 0.8);
+}
+
+.cl-footerActionText {
+    color: hsl(var(--muted-foreground));
+}
+
+.cl-identityPreviewText {
+    color: hsl(var(--foreground));
+}
+
+.cl-identityPreviewEditButton {
+    color: hsl(var(--primary));
+}
+
+.cl-identityPreviewEditButton:hover {
+    color: hsl(var(--primary) / 0.8);
+}
+
+.cl-formFieldInputShowPasswordButton {
+    color: hsl(var(--muted-foreground));
+}
+
+.cl-formFieldInputShowPasswordButton:hover {
+    color: hsl(var(--foreground));
+}
+
+.cl-otpCodeFieldInput {
+    border-color: hsl(var(--input));
+    color: hsl(var(--foreground));
+}
+
+.cl-formResendCodeLink {
+    color: hsl(var(--primary));
+}
+
+.cl-formResendCodeLink:hover {
+    color: hsl(var(--primary) / 0.8);
+}
+
+.cl-formFieldErrorText {
+    color: hsl(var(--destructive));
+}
+
+.cl-alert {
+    color: hsl(var(--destructive));
+}
+
+.cl-formHeaderTitle {
+    color: hsl(var(--foreground));
+}
+
+.cl-formHeaderSubtitle {
+    color: hsl(var(--muted-foreground));
+}
