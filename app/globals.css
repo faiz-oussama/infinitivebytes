@@ -124,12 +124,6 @@
     /* Prevent scrollbar from disappearing when dropdowns/modals open */
     scrollbar-gutter: stable;
   }
-
-  /* Override Radix UI's pointer-events-none on body when dropdown is open */
-  body[data-scroll-locked] {
-    overflow: auto !important;
-    padding-right: 0 !important;
-  }
 }
 
 #webgl {
