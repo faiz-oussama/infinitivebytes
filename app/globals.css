@@ -119,10 +119,18 @@
     @apply border-border outline-ring/50;
   }
 
+  /* Force scrollbar to always be visible to prevent layout shift */
+  html {
+    overflow-y: scroll;
+  }
+
   body {
     @apply bg-background text-foreground;
-    /* Prevent scrollbar from disappearing when dropdowns/modals open */
-    scrollbar-gutter: stable;
+  }
+
+  /* Prevent Radix UI from disabling scroll when dropdowns/modals open */
+  body[data-scroll-locked] {
+    margin-right: 0 !important;
   }
 }
 
