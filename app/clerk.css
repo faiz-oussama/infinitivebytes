@@ -1,11 +1,18 @@
+/* Clerk Component Customization */
+/* Apply design system colors to Clerk components */
+
 .cl-rootBox {
     margin: 0 auto;
 }
 
 .cl-card {
     background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
+    border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+.dark .cl-card {
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
 .cl-headerTitle {
@@ -49,15 +56,23 @@
 
 .cl-formFieldInput {
     background-color: hsl(var(--background));
-    border-color: hsl(var(--input));
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: hsl(var(--foreground));
     border-radius: 0.625rem;
+}
+
+.dark .cl-formFieldInput {
+    border-color: rgba(255, 255, 255, 0.15);
 }
 
 .cl-formFieldInput:focus {
     outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
-    border-color: hsl(var(--ring));
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.dark .cl-formFieldInput:focus {
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 .cl-formFieldLabel {

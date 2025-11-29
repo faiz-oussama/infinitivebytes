@@ -20,6 +20,7 @@ export function ClerkThemeProvider({ children }: { children: ReactNode }) {
                     colorTextSecondary: isDark ? '#b4b4b4' : '#8e8e8e',
                     colorDanger: '#ef4444',
                     colorShimmer: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                    colorNeutral: isDark ? '#525252' : '#e5e5e5',
                     borderRadius: '0.625rem',
                     fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
                 }
