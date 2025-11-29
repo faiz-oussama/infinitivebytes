@@ -203,7 +203,7 @@ export function ContactsTable({
         }),
         columnHelper.display({
             id: 'actions',
-            header: () => <div className="text-right">Actions</div>,
+            header: () => <div className="text-center">Actions</div>,
             cell: ({ row }) => {
                 const isViewed = viewedContacts.has(row.original.id)
                 const contact = row.original
