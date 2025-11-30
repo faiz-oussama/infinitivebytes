@@ -22,14 +22,14 @@ export function ClerkThemeProvider({ children }: { children: ReactNode }) {
                 },
                 elements: {
                     formFieldInput: {
-                        border: '1px solid #e5e5e5',
+                        border: '1px solid #212121',
                         '&:hover': {
-                            border: '1px solid #d4d4d4',
+                            border: '1px solid #000000',
                         },
                         '&:focus': {
-                            border: '1px solid #212121',
+                            border: '2px solid #212121',
                             outline: 'none',
-                            boxShadow: '0 0 0 1px #212121',
+                            boxShadow: '0 0 0 2px rgba(33, 33, 33, 0.1)',
                         },
                     },
                     formButtonPrimary: {
