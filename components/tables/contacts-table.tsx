@@ -104,7 +104,6 @@ export function ContactsTable({
                 if (localViewsToday + 1 >= 50) {
                     setShowUpgradePrompt(true)
                 }
-                router.refresh()
             } else {
                 const data = await response.json()
                 if (data.error === 'Daily limit reached') {
@@ -150,7 +149,6 @@ export function ContactsTable({
                 if (data.viewsToday >= 50) {
                     setShowUpgradePrompt(true)
                 }
-                router.refresh()
             } else {
                 const data = await response.json()
                 if (data.error === 'Daily limit reached') {
