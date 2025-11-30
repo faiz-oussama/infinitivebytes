@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
 import { ChevronLeft, ChevronRight, Search, Eye, EyeOff, ArrowUpDown, MoreHorizontal, Copy, Star } from 'lucide-react'
 import { UpgradePrompt } from '@/components/upgrade-prompt'
 import { toast } from 'sonner'
@@ -56,6 +57,7 @@ type ContactsTableProps = {
     viewsToday: number
     isAtLimit: boolean
     viewedContactIds: string[]
+    filter: string
 }
 
 const columnHelper = createColumnHelper<Contact>()
@@ -69,6 +71,7 @@ export function ContactsTable({
     viewsToday,
     isAtLimit,
     viewedContactIds,
+    filter,
 }: ContactsTableProps) {
     const router = useRouter()
     const [search, setSearch] = useState(searchQuery)
@@ -77,6 +80,8 @@ export function ContactsTable({
     const [localViewsToday, setLocalViewsToday] = useState(viewsToday)
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+    const [selectedContacts, setSelectedContacts] = useState<Set<string>>(new Set())
+    const [isMarkingAsViewed, setIsMarkingAsViewed] = useState(false)
 
     const handleViewContact = async (contactId: string) => {
         if (isAtLimit || localViewsToday >= 50) {
@@ -114,7 +119,113 @@ export function ContactsTable({
         }
     }
 
+    const handleBulkView = async () => {
+        const contactsToView = Array.from(selectedContacts)
+        if (contactsToView.length === 0) return
+
+        if (isAtLimit || localViewsToday >= 50) {
+            setShowUpgradePrompt(true)
+            return
+        }
+
+        setIsMarkingAsViewed(true)
+        try {
+            const response = await fetch('/api/contacts/bulk-view', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contactIds: contactsToView }),
+            })
+
+            if (response.ok) {
+                const data = await response.json()
+                setViewedContacts((prev) => {
+                    const newSet = new Set(prev)
+                    contactsToView.forEach((id) => newSet.add(id))
+                    return newSet
+                })
+                setLocalViewsToday(data.viewsToday)
+                setSelectedContacts(new Set())
+                toast.success(data.message)
+
+                if (data.viewsToday >= 50) {
+                    setShowUpgradePrompt(true)
+                }
+                router.refresh()
+            } else {
+                const data = await response.json()
+                if (data.error === 'Daily limit reached') {
+                    setShowUpgradePrompt(true)
+                    toast.error(`Daily limit reached. ${data.remaining} views remaining.`)
+                } else {
+                    toast.error('Failed to view contacts')
+                }
+            }
+        } catch (error) {
+            toast.error('An error occurred while viewing contacts')
+        } finally {
+            setIsMarkingAsViewed(false)
+        }
+    }
+
+    const handleToggleSelection = (contactId: string) => {
+        setSelectedContacts((prev) => {
+            const newSet = new Set(prev)
+            if (newSet.has(contactId)) {
+                newSet.delete(contactId)
+            } else {
+                newSet.add(contactId)
+            }
+            return newSet
+        })
+    }
+
+    const handleSelectAll = () => {
+        const unviewedOnPage = contacts.filter((c) => !viewedContacts.has(c.id)).map((c) => c.id)
+        if (selectedContacts.size === unviewedOnPage.length) {
+            setSelectedContacts(new Set())
+        } else {
+            setSelectedContacts(new Set(unviewedOnPage))
+        }
+    }
+
+    const handleFilterChange = (newFilter: string) => {
+        const params = new URLSearchParams()
+        if (search) params.set('search', search)
+        if (newFilter !== 'all') params.set('filter', newFilter)
+        router.push(`/contacts?${params.toString()}`)
+    }
+
+    const unviewedOnPage = contacts.filter((c) => !viewedContacts.has(c.id))
+    const allUnviewedSelected = unviewedOnPage.length > 0 && selectedContacts.size === unviewedOnPage.length
+
     const columns = [
+        columnHelper.display({
+            id: 'select',
+            header: () => (
+                <div className="flex items-center justify-center">
+                    {unviewedOnPage.length > 0 && (
+                        <Checkbox
+                            checked={allUnviewedSelected}
+                            onCheckedChange={handleSelectAll}
+                            aria-label="Select all unviewed contacts"
+                        />
+                    )}
+                </div>
+            ),
+            cell: ({ row }) => {
+                const isViewed = viewedContacts.has(row.original.id)
+                if (isViewed) return null
+                return (
+                    <div className="flex items-center justify-center">
+                        <Checkbox
+                            checked={selectedContacts.has(row.original.id)}
+                            onCheckedChange={() => handleToggleSelection(row.original.id)}
+                            aria-label={`Select contact ${row.original.id}`}
+                        />
+                    </div>
+                )
+            },
+        }),
         columnHelper.accessor(
             (row) => [row.first_name, row.last_name].filter(Boolean).join(' '),
             {
@@ -298,7 +409,7 @@ export function ContactsTable({
         },
         initialState: {
             pagination: {
-                pageSize: 20,
+                pageSize: 15,
             },
         },
     })
@@ -319,6 +430,30 @@ export function ContactsTable({
 
     return (
         <div className="space-y-4">
+            <div className="flex gap-2">
+                <Button
+                    variant={filter === 'all' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handleFilterChange('all')}
+                >
+                    All
+                </Button>
+                <Button
+                    variant={filter === 'viewed' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handleFilterChange('viewed')}
+                >
+                    Viewed
+                </Button>
+                <Button
+                    variant={filter === 'unviewed' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handleFilterChange('unviewed')}
+                >
+                    Unviewed
+                </Button>
+            </div>
+
             <form onSubmit={handleSearch} className="flex gap-2">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -332,6 +467,26 @@ export function ContactsTable({
                 <Button type="submit">Search</Button>
             </form>
 
+            {selectedContacts.size > 0 && (
+                <div className="flex items-center gap-2">
+                    <Button
+                        onClick={handleBulkView}
+                        disabled={isMarkingAsViewed}
+                        className="gap-2"
+                    >
+                        <Eye className="h-4 w-4" />
+                        Mark {selectedContacts.size} as Viewed
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedContacts(new Set())}
+                    >
+                        Clear Selection
+                    </Button>
+                </div>
+            )}
+
             <div className="rounded-md border">
                 <Table className="table-fixed w-full text-sm">
                     <TableHeader>
@@ -339,13 +494,14 @@ export function ContactsTable({
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     const widthClass =
-                                        header.id === 'name' ? 'w-[12%]' :
-                                            header.id === 'email' ? 'w-[22%]' :
-                                                header.id === 'phone' ? 'w-[11%]' :
-                                                    header.id === 'title' ? 'w-[18%]' :
-                                                        header.id === 'department' ? 'w-[13%]' :
-                                                            header.id === 'agency.name' ? 'w-[12%]' :
-                                                                'w-[12%]'
+                                        header.id === 'select' ? 'w-[5%]' :
+                                            header.id === 'name' ? 'w-[11%]' :
+                                                header.id === 'email' ? 'w-[20%]' :
+                                                    header.id === 'phone' ? 'w-[10%]' :
+                                                        header.id === 'title' ? 'w-[17%]' :
+                                                            header.id === 'department' ? 'w-[12%]' :
+                                                                header.id === 'agency.name' ? 'w-[11%]' :
+                                                                    'w-[14%]'
                                     return (
                                         <TableHead key={header.id} className={widthClass}>
                                             {header.isPlaceholder
