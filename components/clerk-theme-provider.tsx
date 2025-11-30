@@ -37,6 +37,15 @@ export function ClerkThemeProvider({ children }: { children: ReactNode }) {
                             backgroundColor: '#171717',
                         },
                     },
+                    userButtonPopoverActionButton: {
+                        color: '#212121',
+                        '&:hover': {
+                            color: '#000000',
+                        },
+                    },
+                    userButtonPopoverActionButtonText: {
+                        color: '#212121',
+                    },
                 },
             }}
         >

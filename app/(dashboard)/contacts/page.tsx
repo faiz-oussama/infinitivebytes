@@ -1,66 +1,61 @@
 import prisma from '@/lib/db'
 import { getCurrentUserId, checkDailyLimit } from '@/lib/daily-limit'
 import { ContactsTable } from '@/components/tables/contacts-table'
-import { unstable_cache } from 'next/cache'
 
 export const dynamic = 'force-dynamic'
 
-const getContacts = unstable_cache(
-    async (search: string, skip: number, perPage: number, filter: string, userId: string) => {
-        const searchWhere = search
-            ? {
-                OR: [
-                    { first_name: { contains: search, mode: 'insensitive' as const } },
-                    { last_name: { contains: search, mode: 'insensitive' as const } },
-                    { email: { contains: search, mode: 'insensitive' as const } },
-                    { title: { contains: search, mode: 'insensitive' as const } },
-                    { department: { contains: search, mode: 'insensitive' as const } },
-                ],
-            }
-            : {}
-
-        // Build filter condition based on view status
-        let filterWhere = {}
-        if (filter === 'viewed') {
-            filterWhere = {
-                views: {
-                    some: {
-                        user_id: userId,
-                    },
-                },
-            }
-        } else if (filter === 'unviewed') {
-            filterWhere = {
-                views: {
-                    none: {
-                        user_id: userId,
-                    },
-                },
-            }
+async function getContacts(search: string, skip: number, perPage: number, filter: string, userId: string) {
+    const searchWhere = search
+        ? {
+            OR: [
+                { first_name: { contains: search, mode: 'insensitive' as const } },
+                { last_name: { contains: search, mode: 'insensitive' as const } },
+                { email: { contains: search, mode: 'insensitive' as const } },
+                { title: { contains: search, mode: 'insensitive' as const } },
+                { department: { contains: search, mode: 'insensitive' as const } },
+            ],
         }
+        : {}
 
-        const where = { ...searchWhere, ...filterWhere }
+    // Build filter condition based on view status
+    let filterWhere = {}
+    if (filter === 'viewed') {
+        filterWhere = {
+            views: {
+                some: {
+                    user_id: userId,
+                },
+            },
+        }
+    } else if (filter === 'unviewed') {
+        filterWhere = {
+            views: {
+                none: {
+                    user_id: userId,
+                },
+            },
+        }
+    }
 
-        return await Promise.all([
-            prisma.contact.findMany({
-                where,
-                skip,
-                take: perPage,
-                orderBy: { first_name: 'asc' },
-                include: {
-                    agency: {
-                        select: {
-                            name: true,
-                        },
+    const where = { ...searchWhere, ...filterWhere }
+
+    return await Promise.all([
+        prisma.contact.findMany({
+            where,
+            skip,
+            take: perPage,
+            orderBy: { first_name: 'asc' },
+            include: {
+                agency: {
+                    select: {
+                        name: true,
                     },
                 },
-            }),
-            prisma.contact.count({ where }),
-        ])
-    },
-    ['contacts'],
-    { revalidate: 60, tags: ['contacts'] }
-)
+            },
+        }),
+        prisma.contact.count({ where }),
+    ])
+}
 
 
 export default async function ContactsPage({
