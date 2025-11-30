@@ -424,6 +424,7 @@ export function ContactsTable({
     const handlePageChange = (page: number) => {
         const params = new URLSearchParams()
         if (search) params.set('search', search)
+        if (filter && filter !== 'all') params.set('filter', filter)
         params.set('page', page.toString())
         router.push(`/contacts?${params.toString()}`)
     }
