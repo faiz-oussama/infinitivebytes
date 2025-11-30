@@ -2,6 +2,7 @@ import { UserButton } from '@clerk/nextjs'
 import { DailyLimitHeader } from '@/components/daily-limit-header'
 import { Logo } from '@/components/logo'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { MobileNav } from '@/components/mobile-nav'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 
@@ -14,9 +15,12 @@ export default function DashboardLayout({
         <div className="min-h-screen bg-background">
             <div className="fixed z-50 pt-4 md:pt-6 top-0 left-0 w-full bg-background/80 backdrop-blur-sm border-b">
                 <header className="flex items-center justify-between container mx-auto px-4 md:px-8 pb-4">
-                    <Link href="/dashboard">
-                        <Logo className="w-[50px] md:w-[60px] text-foreground" />
-                    </Link>
+                    <div className="flex items-center gap-4">
+                        <MobileNav />
+                        <Link href="/dashboard">
+                            <Logo className="w-[50px] md:w-[60px] text-foreground" />
+                        </Link>
+                    </div>
                     <nav className="flex max-lg:hidden absolute left-1/2 -translate-x-1/2 items-center justify-center gap-x-10">
                         {[
                             { name: "Overview", href: "/dashboard" },
