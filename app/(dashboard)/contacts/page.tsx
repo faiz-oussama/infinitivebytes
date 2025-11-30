@@ -23,7 +23,7 @@ const getContacts = unstable_cache(
         let filterWhere = {}
         if (filter === 'viewed') {
             filterWhere = {
-                ContactView: {
+                views: {
                     some: {
                         user_id: userId,
                     },
@@ -31,7 +31,7 @@ const getContacts = unstable_cache(
             }
         } else if (filter === 'unviewed') {
             filterWhere = {
-                ContactView: {
+                views: {
                     none: {
                         user_id: userId,
                     },
